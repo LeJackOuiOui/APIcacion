@@ -166,10 +166,27 @@ class _NotasPageState extends State<NotasPage> {
     return Scaffold(
       return Scaffold(
   appBar: AppBar(
-    title: const Text('APIcacion'),
     centerTitle: true,
+    title: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          'assets/logo.png',
+          height: 30,
+        ),
+        const SizedBox(width: 8),
+        const Text('APIcacion'),
+      ],
+    ),
+    actions: [
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: () {
+          print("Buscar");
+        },
+      ),
+    ],
   ),
-  
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _notasStream,
         builder: (context, snapshot) {
