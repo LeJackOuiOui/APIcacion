@@ -20,21 +20,19 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  // COLORES DE TU PALETA (ajustados para mejor contraste)
+  // COLORES DE TU PALETA
   static const Color fondo = Color(0xFFB1C1C0);
   static const Color cardColor = Color(0xFFDCEDB9);
   static const Color botonColor = Color(0xFFD2E59E);
-  static const Color textoOscuro = Color(0xFF5E5A46);
+  static const Color appBarColor = Color(0xFFCBD081);
+  static const Color textoOscuro = Color(0xFF918868);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: fondo,
-
       appBar: AppBar(
         elevation: 0,
-
-        // GRADIENTE COOL
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -47,27 +45,22 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
-
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset(
-            'assets/logo.png',
-            fit: BoxFit.contain,
+          child: Container(
+            color: const Color(0xFF6B4F2A), // fondo café detrás del logo
+            child: Image.asset(
+              'assets/logo.png',
+              fit: BoxFit.contain,
+            ),
           ),
         ),
-
         leadingWidth: 60,
-
         title: const Text(
           'APIcacion',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
-
         centerTitle: true,
-
         actions: [
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
@@ -101,20 +94,15 @@ class HomePage extends StatelessWidget {
       ),
 
       bottomNavigationBar: BottomAppBar(
-        color: const Color(0xFFCBD081),
+        color: appBarColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
-              Text(
-                "© 2026 APIcacion",
-                style: TextStyle(color: Colors.white),
-              ),
-              Text(
-                "Todos los derechos reservados",
-                style: TextStyle(color: Colors.white),
-              ),
+              Text("© 2026 APIcacion", style: TextStyle(color: Colors.white)),
+              Text("Todos los derechos reservados",
+                  style: TextStyle(color: Colors.white)),
             ],
           ),
         ),
@@ -123,62 +111,78 @@ class HomePage extends StatelessWidget {
   }
 
   Widget buildCard(String titulo, String descripcion, String imagen) {
-    return Card(
-      color: cardColor,
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            child: Image.network(
-              imagen,
-              height: 120,
-              width: double.infinity,
-              fit: BoxFit.cover,
+    return StatefulBuilder(
+      builder: (context, setState) {
+        bool hovering = false;
+
+        return MouseRegion(
+          onEnter: (_) => setState(() => hovering = true),
+          onExit: (_) => setState(() => hovering = false),
+          child: AnimatedScale(
+            duration: const Duration(milliseconds: 200),
+            scale: hovering ? 1.05 : 1.0,
+            child: Card(
+              color: cardColor,
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(20)),
+                    child: Image.network(
+                      imagen,
+                      height: 120,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          titulo,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: textoOscuro,
+                          ),
+                        ),
+
+                        const SizedBox(height: 5),
+
+                        Text(
+                          descripcion,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: textoOscuro,
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: botonColor,
+                            foregroundColor: textoOscuro,
+                          ),
+                          onPressed: () {},
+                          child: const Text("Ver más"),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  titulo,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: textoOscuro,
-                  ),
-                ),
-
-                const SizedBox(height: 5),
-
-                Text(
-                  descripcion,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: textoOscuro,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: botonColor,
-                    foregroundColor: textoOscuro,
-                  ),
-                  onPressed: () {},
-                  child: const Text("Ver más"),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
