@@ -131,6 +131,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
+      title: 'APIcacion',
       home: HomePage(),
     );
   }
@@ -149,18 +150,32 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              print("Buscar");
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Función de búsqueda en desarrollo")),
+              );
             },
           ),
         ],
       ),
 
-      // PIE DE PÁGINA
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(10),
-        alignment: Alignment.center,
-        child: const Text(
-          "© 2026 APIcacion",
+      body: const Center(
+        child: Text(
+          "Bienvenido a APIcacion",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      ),
+
+      // PIE DE PÁGINA PROFESIONAL SIN ESTILOS
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text("© 2026 APIcacion"),
+              Text("Todos los derechos reservados"),
+            ],
+          ),
         ),
       ),
     );
