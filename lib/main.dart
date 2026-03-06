@@ -1,4 +1,3 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -21,12 +20,12 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
- // PALETA DE COLORES
-  static const Color fondo = Color(0xFFDCEDB9);
-  static const Color appBarColor = Color(0xFFB1C1C0);
-  static const Color cardColor = Color(0xFFD2E59E);
-  static const Color botonColor = Color(0xFFCBD081);
-  static const Color footerColor = Color(0xFF918868);
+   // COLORES DE TU PALETA
+  static const Color fondo = Color(0xFFB1C1C0);
+  static const Color cardColor = Color(0xFFDCEDB9);
+  static const Color botonColor = Color(0xFFD2E59E);
+  static const Color appBarColor = Color(0xFFCBD081);
+  static const Color textoOscuro = Color(0xFF918868);
 
   @override
   Widget build(BuildContext context) {
