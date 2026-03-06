@@ -118,18 +118,9 @@
 //     );
 //   }
 // }
-
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await Supabase.initialize(
-    url: 'TU_SUPABASE_URL',
-    anonKey: 'TU_SUPABASE_ANON_KEY',
-  );
-
+void main() {
   runApp(const MyApp());
 }
 
@@ -138,25 +129,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'APIcacion',
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true),
-      home: const NotasPage(),
+      home: HomePage(),
     );
   }
 }
 
-class NotasPage extends StatefulWidget {
-  const NotasPage({super.key});
-
-  @override
-  State<NotasPage> createState() => _NotasPageState();
-}
-
-class _NotasPageState extends State<NotasPage> {
-  final _notasStream =
-      Supabase.instance.client.from('notas').stream(primaryKey: ['id']);
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -173,44 +154,15 @@ class _NotasPageState extends State<NotasPage> {
           ),
         ],
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _notasStream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
 
-          final notas = snapshot.data!;
-
-          return ListView.builder(
-            itemCount: notas.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(notas[index]['titulo'] ?? 'Sin título'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await Supabase.instance.client
-                        .from('notas')
-                        .delete()
-                        .match({'id': notas[index]['id']});
-                  },
-                ),
-              );
-            },
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () async {
-          await Supabase.instance.client.from('notas').insert({
-            'titulo': 'Nueva nota ${DateTime.now()}',
-          });
-        },
+      // PIE DE PÁGINA
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(10),
+        alignment: Alignment.center,
+        child: const Text(
+          "© 2026 APIcacion",
+        ),
       ),
     );
   }
 }
-
-final supabase = Supabase.instance.client;
