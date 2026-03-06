@@ -31,6 +31,14 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(   
+            'assets/logo.png',
+            fit: BoxFit.contain,
+          ),
+        ),
+        leadingWidth: 60,
         title: const Text('APIcacion'),
         centerTitle: true,
         actions: [
