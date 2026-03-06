@@ -1,8 +1,20 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+Future<void> main() async {
+  // Asegúrate de que los widgets estén vinculados
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'TU_SUPABASE_URL',
+    anonKey: 'TU_SUPABASE_ANON_KEY',
+  );
+
   runApp(const MyApp());
 }
+
+// Un acceso rápido al cliente para usarlo en cualquier parte
+final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -36,10 +48,7 @@ class HomePage extends StatelessWidget {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0xFFCBD081),
-                Color(0xFFD2E59E),
-              ],
+              colors: [Color(0xFFCBD081), Color(0xFFD2E59E)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -49,17 +58,11 @@ class HomePage extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Container(
             color: const Color(0xFF6B4F2A), // fondo café detrás del logo
-            child: Image.asset(
-              'assets/logo.png',
-              fit: BoxFit.contain,
-            ),
+            child: Image.asset('assets/logo.png', fit: BoxFit.contain),
           ),
         ),
         leadingWidth: 60,
-        title: const Text(
-          'APIcacion',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('APIcacion', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -85,10 +88,22 @@ class HomePage extends StatelessWidget {
           children: [
             buildCard("Maíz", "Cultivo de maíz", "https://picsum.photos/200"),
             buildCard("Papa", "Cultivo de papa", "https://picsum.photos/201"),
-            buildCard("Tomate", "Cultivo de tomate", "https://picsum.photos/202"),
-            buildCard("Café", "Producción de café", "https://picsum.photos/203"),
+            buildCard(
+              "Tomate",
+              "Cultivo de tomate",
+              "https://picsum.photos/202",
+            ),
+            buildCard(
+              "Café",
+              "Producción de café",
+              "https://picsum.photos/203",
+            ),
             buildCard("Arroz", "Cultivo de arroz", "https://picsum.photos/204"),
-            buildCard("Frijol", "Cultivo de frijol", "https://picsum.photos/205"),
+            buildCard(
+              "Frijol",
+              "Cultivo de frijol",
+              "https://picsum.photos/205",
+            ),
           ],
         ),
       ),
@@ -101,8 +116,10 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
               Text("© 2026 APIcacion", style: TextStyle(color: Colors.white)),
-              Text("Todos los derechos reservados",
-                  style: TextStyle(color: Colors.white)),
+              Text(
+                "Todos los derechos reservados",
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
         ),
@@ -125,13 +142,15 @@ class HomePage extends StatelessWidget {
               color: cardColor,
               elevation: 8,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(20)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
                     child: Image.network(
                       imagen,
                       height: 120,
