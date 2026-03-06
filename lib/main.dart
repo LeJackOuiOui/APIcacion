@@ -176,18 +176,77 @@ class _NotasPageState extends State<NotasPage> {
           return ListView.builder(
             itemCount: notas.length,
             itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(notas[index]['titulo'] ?? 'Sin título'),
-                trailing: IconButton(
+return Card(
+  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+  elevation: 4,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+
+      // Imagen
+      ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+        child: Image.network(
+          "https://picsum.photos/400/200?random=$index",
+          height: 180,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
+      ),
+
+      Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            // Titulo
+            Text(
+              notas[index]['titulo'] ?? 'Sin título',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            // Descripción
+            const Text(
+              "Pequeña descripción de la nota.",
+            ),
+
+            const SizedBox(height: 10),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+
+                ElevatedButton(
+                  onPressed: () {},
+                  child: const Text("Ver más"),
+                ),
+
+                IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: () async {
-                    // Ejemplo de DELETE
-                    await Supabase.instance.client.from('notas').delete().match(
-                      {'id': notas[index]['id']},
-                    );
+                    await Supabase.instance.client
+                        .from('notas')
+                        .delete()
+                        .match({'id': notas[index]['id']});
                   },
                 ),
-              );
+              ],
+            )
+          ],
+        ),
+      )
+    ],
+  ),
+);
             },
           );
         },
