@@ -13,9 +13,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 6, 161, 125)),
       ),
-      home: const MyHomePage(title: 'Agronegocio'),
+      home: const MyHomePage(title: 'Cultivos en Colombia'),
     );
   }
 }
