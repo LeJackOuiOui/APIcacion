@@ -5,8 +5,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
-    url: 'TU_SUPABASE_URL',
-    anonKey: 'TU_SUPABASE_ANON_KEY',
+    url: 'https://ltkcczdfcmtfpeluizft.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0a2NjemRmY210ZnBlbHVpemZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTgxMTAsImV4cCI6MjA4MDg3NDExMH0.YuRca19Vv_eSbvyziD_XbMAXJIXXZednh0_z5mMIxA0',
   );
 
   runApp(const MyApp());
@@ -28,7 +29,6 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  // Cambiado a StatefulWidget para manejar estados si es necesario
   const HomePage({super.key});
 
   @override
@@ -36,22 +36,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // PALETA DE COLORES
   static const Color fondo = Color(0xFFB1C1C0);
   static const Color cardColor = Color(0xFFDCEDB9);
   static const Color botonColor = Color(0xFFD2E59E);
   static const Color appBarColor = Color(0xFFCBD081);
   static const Color textoOscuro = Color(0xFF918868);
 
-  // FUNCIÓN CRUD: SELECT
-  // Esta función va a Supabase y trae la lista de productos
   Future<List<Map<String, dynamic>>> getProductos() async {
     try {
       final response = await supabase
           .from('Productos')
-          .select(
-            'id_producto, nombre, precio, descripcion, imagen_url, created_at',
-          );
+          .select('id_producto, nombre, precio, descripcion, imagen_url');
+
+      print("Datos recibidos: $response");
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
       print("Error en Supabase: $e");
@@ -85,55 +82,44 @@ class _HomePageState extends State<HomePage> {
         title: const Text('APIcacion', style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
-
-      // IMPLEMENTACIÓN DEL FUTUREBUILDER
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: getProductos(),
         builder: (context, snapshot) {
-          // 1. Mientras carga
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(color: textoOscuro),
             );
           }
 
-          // 2. Si hay error
           if (snapshot.hasError) {
             return Center(
               child: Text("Error al conectar con Supabase: ${snapshot.error}"),
             );
           }
 
-          // 3. Si no hay datos
           final productos = snapshot.data ?? [];
           if (productos.isEmpty) {
             return const Center(child: Text("No hay productos registrados"));
           }
 
-          // 4. Mostrar Grid con datos reales
           return Padding(
             padding: const EdgeInsets.all(10),
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+                crossAxisCount: 5,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 0.75, // Ajustado para que quepa el contenido
+                childAspectRatio: 0.48,
               ),
               itemCount: productos.length,
               itemBuilder: (context, index) {
-                final item = productos[index];
-                return buildCard(
-                  item['nombre'] ?? 'Sin nombre',
-                  item['descripcion'] ?? 'Sin descripción',
-                  item['imagen_url'] ?? 'https://picsum.photos/200',
-                );
+                // Pasamos el objeto completo 'item' a buildCard
+                return buildCard(productos[index]);
               },
             ),
           );
         },
       ),
-
       bottomNavigationBar: BottomAppBar(
         color: appBarColor,
         child: const Padding(
@@ -153,7 +139,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildCard(String titulo, String descripcion, String imagen) {
+  // Widget buildCard actualizado para recibir el Map completo
+  Widget buildCard(Map<String, dynamic> item) {
+    final String titulo = item['nombre'] ?? 'Sin nombre';
+    final String descripcion = item['descripcion'] ?? 'Sin descripción';
+    final String imagen = item['imagen_url'] ?? 'https://picsum.photos/200';
+
     return StatefulBuilder(
       builder: (context, setState) {
         bool hovering = false;
@@ -178,7 +169,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Image.network(
                       imagen,
-                      height: 100, // Un poco más pequeña para el grid
+                      height: 200,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
@@ -198,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                             color: textoOscuro,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 10),
                         Text(
                           descripcion,
                           maxLines: 2,
@@ -208,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                             color: textoOscuro,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -217,7 +208,16 @@ class _HomePageState extends State<HomePage> {
                               foregroundColor: textoOscuro,
                               padding: EdgeInsets.zero,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              // NAVEGACIÓN A DETALLE
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DetalleProducto(producto: item),
+                                ),
+                              );
+                            },
                             child: const Text(
                               "Ver más",
                               style: TextStyle(fontSize: 12),
@@ -233,6 +233,93 @@ class _HomePageState extends State<HomePage> {
           ),
         );
       },
+    );
+  }
+}
+
+// --- NUEVA PANTALLA DE DETALLE ---
+class DetalleProducto extends StatelessWidget {
+  final Map<String, dynamic> producto;
+
+  const DetalleProducto({super.key, required this.producto});
+
+  @override
+  Widget build(BuildContext context) {
+    const Color fondo = Color(0xFFB1C1C0);
+    const Color cardColor = Color(0xFFDCEDB9);
+    const Color textoOscuro = Color(0xFF918868);
+
+    return Scaffold(
+      backgroundColor: fondo,
+      appBar: AppBar(
+        title: Text(producto['nombre'] ?? 'Detalle del Producto'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFFCBD081), Color(0xFFD2E59E)],
+            ),
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Image.network(
+              producto['imagen_url'] ?? 'https://picsum.photos/600',
+              width: double.infinity,
+              height: 350,
+              fit: BoxFit.cover,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      producto['nombre'] ?? 'Sin nombre',
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: textoOscuro,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Precio: \$${producto['precio'] ?? '0'}",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
+                    const Divider(height: 30, color: textoOscuro),
+                    const Text(
+                      "Descripción completa:",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textoOscuro,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      producto['descripcion'] ?? 'Sin descripción.',
+                      style: const TextStyle(fontSize: 16, color: textoOscuro),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
