@@ -130,7 +130,7 @@ void main() async {
     anonKey: 'TU_SUPABASE_ANON_KEY',
   );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -139,15 +139,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Supabase CRUD',
+      title: 'APIcacion',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.indigo, useMaterial3: true),
-      home: const NotasPage(), // Aquí indicamos la pantalla de inicio
+      theme: ThemeData(useMaterial3: true),
+      home: const NotasPage(),
     );
   }
 }
 
-// 2. La pantalla que muestra la lista de la "API"
 class NotasPage extends StatefulWidget {
   const NotasPage({super.key});
 
@@ -156,42 +155,30 @@ class NotasPage extends StatefulWidget {
 }
 
 class _NotasPageState extends State<NotasPage> {
-  // Llamamos al cliente directamente para este ejemplo rápido
-  final _notasStream = Supabase.instance.client
-      .from('notas')
-      .stream(primaryKey: ['id']);
+  final _notasStream =
+      Supabase.instance.client.from('notas').stream(primaryKey: ['id']);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      return Scaffold(
-  appBar: AppBar(
-    centerTitle: true,
-    title: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.asset(
-          'assets/logo.png',
-          height: 30,
-        ),
-        const SizedBox(width: 8),
-        const Text('APIcacion'),
-      ],
-    ),
-    actions: [
-      IconButton(
-        icon: const Icon(Icons.search),
-        onPressed: () {
-          print("Buscar");
-        },
+      appBar: AppBar(
+        title: const Text('APIcacion'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              print("Buscar");
+            },
+          ),
+        ],
       ),
-    ],
-  ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _notasStream,
         builder: (context, snapshot) {
-          if (!snapshot.hasData)
+          if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
 
           final notas = snapshot.data!;
 
@@ -201,12 +188,12 @@ class _NotasPageState extends State<NotasPage> {
               return ListTile(
                 title: Text(notas[index]['titulo'] ?? 'Sin título'),
                 trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: const Icon(Icons.delete),
                   onPressed: () async {
-                    // Ejemplo de DELETE
-                    await Supabase.instance.client.from('notas').delete().match(
-                      {'id': notas[index]['id']},
-                    );
+                    await Supabase.instance.client
+                        .from('notas')
+                        .delete()
+                        .match({'id': notas[index]['id']});
                   },
                 ),
               );
@@ -217,7 +204,6 @@ class _NotasPageState extends State<NotasPage> {
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
-          // Ejemplo de INSERT (POST)
           await Supabase.instance.client.from('notas').insert({
             'titulo': 'Nueva nota ${DateTime.now()}',
           });
@@ -227,5 +213,4 @@ class _NotasPageState extends State<NotasPage> {
   }
 }
 
-// Acceso rápido al cliente
 final supabase = Supabase.instance.client;
