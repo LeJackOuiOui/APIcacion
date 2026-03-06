@@ -164,7 +164,12 @@ class _NotasPageState extends State<NotasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis Notas en Supabase')),
+      return Scaffold(
+  appBar: AppBar(
+    title: const Text('APIcacion'),
+    centerTitle: true,
+  ),
+  
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _notasStream,
         builder: (context, snapshot) {
