@@ -118,19 +118,10 @@
 //     );
 //   }
 // }
-
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await Supabase.initialize(
-    url: 'TU_SUPABASE_URL',
-    anonKey: 'TU_SUPABASE_ANON_KEY',
-  );
-
-  runApp(MyApp());
+void main() {
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -138,72 +129,55 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Supabase CRUD',
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.indigo, useMaterial3: true),
-      home: const NotasPage(), // Aquí indicamos la pantalla de inicio
+      title: 'APIcacion',
+      home: HomePage(),
     );
   }
 }
 
-// 2. La pantalla que muestra la lista de la "API"
-class NotasPage extends StatefulWidget {
-  const NotasPage({super.key});
-
-  @override
-  State<NotasPage> createState() => _NotasPageState();
-}
-
-class _NotasPageState extends State<NotasPage> {
-  // Llamamos al cliente directamente para este ejemplo rápido
-  final _notasStream = Supabase.instance.client
-      .from('notas')
-      .stream(primaryKey: ['id']);
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis Notas en Supabase')),
-      body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: _notasStream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData)
-            return const Center(child: CircularProgressIndicator());
-
-          final notas = snapshot.data!;
-
-          return ListView.builder(
-            itemCount: notas.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(notas[index]['titulo'] ?? 'Sin título'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () async {
-                    // Ejemplo de DELETE
-                    await Supabase.instance.client.from('notas').delete().match(
-                      {'id': notas[index]['id']},
-                    );
-                  },
-                ),
+      appBar: AppBar(
+        title: const Text('APIcacion'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Función de búsqueda en desarrollo")),
               );
             },
-          );
-        },
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () async {
-          // Ejemplo de INSERT (POST)
-          await Supabase.instance.client.from('notas').insert({
-            'titulo': 'Nueva nota ${DateTime.now()}',
-          });
-        },
+
+      body: const Center(
+        child: Text(
+          "Bienvenido a APIcacion",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      ),
+
+      // PIE DE PÁGINA PROFESIONAL SIN ESTILOS
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text("© 2026 APIcacion"),
+              Text("Todos los derechos reservados"),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
-
-// Acceso rápido al cliente
-final supabase = Supabase.instance.client;
