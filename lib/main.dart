@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisCount: 3, // 3 cards por fila
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
-          childAspectRatio: 2,
+          childAspectRatio: 1,
           children: [
 
             buildCard(
