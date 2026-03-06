@@ -2,7 +2,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
-  // Asegúrate de que los widgets estén vinculados
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
@@ -13,7 +12,6 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-// Un acceso rápido al cliente para usarlo en cualquier parte
 final supabase = Supabase.instance.client;
 
 class MyApp extends StatelessWidget {
@@ -29,15 +27,37 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  // Cambiado a StatefulWidget para manejar estados si es necesario
   const HomePage({super.key});
 
-  // COLORES DE TU PALETA
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // PALETA DE COLORES
   static const Color fondo = Color(0xFFB1C1C0);
   static const Color cardColor = Color(0xFFDCEDB9);
   static const Color botonColor = Color(0xFFD2E59E);
   static const Color appBarColor = Color(0xFFCBD081);
   static const Color textoOscuro = Color(0xFF918868);
+
+  // FUNCIÓN CRUD: SELECT
+  // Esta función va a Supabase y trae la lista de productos
+  Future<List<Map<String, dynamic>>> getProductos() async {
+    try {
+      final response = await supabase
+          .from('Productos')
+          .select(
+            'id_producto, nombre, precio, descripcion, imagen_url, created_at',
+          );
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      print("Error en Supabase: $e");
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,64 +77,70 @@ class HomePage extends StatelessWidget {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            color: const Color(0xFF6B4F2A), // fondo café detrás del logo
+            color: const Color(0xFF6B4F2A),
             child: Image.asset('assets/logo.png', fit: BoxFit.contain),
           ),
         ),
         leadingWidth: 60,
         title: const Text('APIcacion', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Función de búsqueda en desarrollo"),
-                ),
-              );
-            },
-          ),
-        ],
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: GridView.count(
-          crossAxisCount: 3,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 1,
-          children: [
-            buildCard("Maíz", "Cultivo de maíz", "https://picsum.photos/200"),
-            buildCard("Papa", "Cultivo de papa", "https://picsum.photos/201"),
-            buildCard(
-              "Tomate",
-              "Cultivo de tomate",
-              "https://picsum.photos/202",
+      // IMPLEMENTACIÓN DEL FUTUREBUILDER
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: getProductos(),
+        builder: (context, snapshot) {
+          // 1. Mientras carga
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: textoOscuro),
+            );
+          }
+
+          // 2. Si hay error
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("Error al conectar con Supabase: ${snapshot.error}"),
+            );
+          }
+
+          // 3. Si no hay datos
+          final productos = snapshot.data ?? [];
+          if (productos.isEmpty) {
+            return const Center(child: Text("No hay productos registrados"));
+          }
+
+          // 4. Mostrar Grid con datos reales
+          return Padding(
+            padding: const EdgeInsets.all(10),
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.75, // Ajustado para que quepa el contenido
+              ),
+              itemCount: productos.length,
+              itemBuilder: (context, index) {
+                final item = productos[index];
+                return buildCard(
+                  item['nombre'] ?? 'Sin nombre',
+                  item['descripcion'] ?? 'Sin descripción',
+                  item['imagen_url'] ?? 'https://picsum.photos/200',
+                );
+              },
             ),
-            buildCard(
-              "Café",
-              "Producción de café",
-              "https://picsum.photos/203",
-            ),
-            buildCard("Arroz", "Cultivo de arroz", "https://picsum.photos/204"),
-            buildCard(
-              "Frijol",
-              "Cultivo de frijol",
-              "https://picsum.photos/205",
-            ),
-          ],
-        ),
+          );
+        },
       ),
 
       bottomNavigationBar: BottomAppBar(
         color: appBarColor,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text("© 2026 APIcacion", style: TextStyle(color: Colors.white)),
               Text(
                 "Todos los derechos reservados",
@@ -131,7 +157,6 @@ class HomePage extends StatelessWidget {
     return StatefulBuilder(
       builder: (context, setState) {
         bool hovering = false;
-
         return MouseRegion(
           onEnter: (_) => setState(() => hovering = true),
           onExit: (_) => setState(() => hovering = false),
@@ -153,45 +178,51 @@ class HomePage extends StatelessWidget {
                     ),
                     child: Image.network(
                       imagen,
-                      height: 120,
+                      height: 100, // Un poco más pequeña para el grid
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
                   ),
-
                   Padding(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           titulo,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: textoOscuro,
                           ),
                         ),
-
-                        const SizedBox(height: 5),
-
+                        const SizedBox(height: 4),
                         Text(
                           descripcion,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 12,
+                            fontSize: 10,
                             color: textoOscuro,
                           ),
                         ),
-
                         const SizedBox(height: 8),
-
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: botonColor,
-                            foregroundColor: textoOscuro,
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: botonColor,
+                              foregroundColor: textoOscuro,
+                              padding: EdgeInsets.zero,
+                            ),
+                            onPressed: () {},
+                            child: const Text(
+                              "Ver más",
+                              style: TextStyle(fontSize: 12),
+                            ),
                           ),
-                          onPressed: () {},
-                          child: const Text("Ver más"),
                         ),
                       ],
                     ),
