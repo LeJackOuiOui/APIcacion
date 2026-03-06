@@ -291,3 +291,66 @@ class _MyHomePageState extends State<MyHomePage> {
 
 // // Acceso rápido al cliente
 // final supabase = Supabase.instance.client;
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'APIcacion',
+      home: HomePage(),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('APIcacion'),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Función de búsqueda en desarrollo")),
+              );
+            },
+          ),
+        ],
+      ),
+
+      body: const Center(
+        child: Text(
+          "Bienvenido a APIcacion",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      ),
+
+      // PIE DE PÁGINA PROFESIONAL SIN ESTILOS
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text("© 2026 APIcacion"),
+              Text("Todos los derechos reservados"),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
